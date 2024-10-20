@@ -1,0 +1,11 @@
+{
+  "name": "Petri.io Operator",
+  "version": "1.0.0",
+  "description": "Petri.io Server Operator",
+  "manifest_version": 3,
+  "author": "Kyle W",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Petri.io Operator"
+  }
+}
