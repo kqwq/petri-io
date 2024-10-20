@@ -1,66 +1,4 @@
-const tools = {
-  randColor: () => {
-    return (
-      '#' +
-      Math.floor(Math.random() * 16777215)
-        .toString(16)
-        .padStart(6, '0')
-    )
-  },
-  /**
-   *
-   * @returns {string} Hex color
-   */
-  randFullSaturationColor: () => {
-    const h = Math.floor(Math.random() * 360)
-    const s = 1
-    const l = 0.5
-    const c = (1 - Math.abs(2 * l - 1)) * s
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
-    const m = l - c / 2
-    let r, g, b
-    if (h < 60) {
-      ;[r, g, b] = [c, x, 0]
-    } else if (h < 120) {
-      ;[r, g, b] = [x, c, 0]
-    } else if (h < 180) {
-      ;[r, g, b] = [0, c, x]
-    } else if (h < 240) {
-      ;[r, g, b] = [0, x, c]
-    } else if (h < 300) {
-      ;[r, g, b] = [x, 0, c]
-    } else {
-      ;[r, g, b] = [c, 0, x]
-    }
-    r = Math.floor((r + m) * 255)
-      .toString(16)
-      .padStart(2, '0')
-    g = Math.floor((g + m) * 255)
-      .toString(16)
-      .padStart(2, '0')
-    b = Math.floor((b + m) * 255)
-      .toString(16)
-      .padStart(2, '0')
-    return `#${r}${g}${b}`
-  },
-  lerpColor: (aIn, bIn, amount) => {
-    const aHex = parseInt(aIn.slice(1), 16)
-    const bHex = parseInt(bIn.slice(1), 16)
-    const r1 = aHex >> 16
-    const g1 = (aHex >> 8) & 0xff
-    const b1 = aHex & 0xff
-    const r2 = bHex >> 16
-    const g2 = (bHex >> 8) & 0xff
-    const b2 = bHex & 0xff
-    const r = Math.round(r1 + (r2 - r1) * amount)
-    const g = Math.round(g1 + (g2 - g1) * amount)
-    const b = Math.round(b1 + (b2 - b1) * amount)
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
-  },
-  rantInt: (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-  },
-}
+import { tools } from './tools.js'
 
 class Food {
   constructor(id, x, y, mass = 1) {
@@ -137,10 +75,14 @@ class Player {
     ctx.lineWidth = S(radius * 0.05)
     ctx.strokeStyle = this.outline
     ctx.stroke()
+
+    // Name tag
     ctx.font = `12px Arial`
-    ctx.fillStyle = '#000'
-    ctx.fillText(this.name, X(this.x), Y(this.y) - 7)
-    ctx.fillText(this.mass, X(this.x), Y(this.y) + 7)
+    ctx.fillStyle = '#fff'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(this.name, X(this.x), Y(this.y) - 16)
+    ctx.fillText(this.mass, X(this.x), Y(this.y))
   }
 }
 
@@ -317,9 +259,13 @@ class GameManager {
     this.tick++
 
     // Draw logic
+
+    // Draw background
     this.ctx.clearRect(0, 0, innerWidth, innerHeight)
-    this.ctx.fillStyle = '#eee'
+    this.ctx.fillStyle = '#111'
     this.ctx.fillRect(0, 0, innerWidth, innerHeight)
+
+    // Draw elements
     for (const f of this.food) {
       f.draw(this.ctx, this.X.bind(this), this.Y.bind(this), this.S.bind(this))
     }
@@ -330,7 +276,8 @@ class GameManager {
 }
 
 const gm = new GameManager()
-const socket = new WebSocket('ws://localhost:3001/budget-agario')
+const url = new URL(window.location.href)
+const socket = new WebSocket(`ws://${url.hostname}:3001/budget-agario`)
 socket.addEventListener('open', () => {
   console.log('Connected to server')
   gm.onSocketOpen()
@@ -357,7 +304,18 @@ document.addEventListener('resize', onResize)
 document.addEventListener('DOMContentLoaded', () => {
   onResize()
   const sgbOverlay = document.getElementById('overlay')
-  document.getElementById('start-game-button').addEventListener('click', () => {
+  const startButton = document.getElementById('start-game-button')
+  const nameInput = document.getElementById('name')
+  nameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      startButton.click()
+    }
+  })
+  startButton.addEventListener('click', () => {
+    if (!nameInput.checkValidity()) {
+      alert('Invalid name')
+      return
+    }
     const canvas = document.getElementsByTagName('canvas')[0]
     const ctx = canvas.getContext('2d')
     gm.init(ctx)

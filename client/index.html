@@ -50,18 +50,27 @@
         border: none;
         cursor: pointer;
       }
+      #hud {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        color: white;
+      }
     </style>
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
   </head>
 
   <body>
-    Budget Agar.io
-    <canvas> </canvas>
+    <canvas></canvas>
+    <div id="hud">
+      <p id="score">Score: 0</p>
+      <p id="leaderboard">Leaderboard:</p>
+    </div>
 
     <div id="overlay">
       <h1>Budget Agar.io</h1>
       <p>Enter your name:</p>
-      <input type="text" id="name" placeholder="Name" />
+      <input type="text" id="name" placeholder="Name" required minlength="1" maxlength="256" />
       <button id="start-game-button">Start Game</button>
     </div>
   </body>
