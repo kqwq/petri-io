@@ -1,3 +1,5 @@
+const BORDER_RADIUS = 400
+const BORDER_THICKNESS = 2
 import { tools } from './tools.js'
 
 class Food {
@@ -28,6 +30,7 @@ class Player {
     this.name = name
     this.id = id
     this.mass = mass
+    this.score = 0
     this.x = x
     this.y = y
     this.velX = 0
@@ -65,6 +68,14 @@ class Player {
     this.velY += (gotoVelY - this.velY) * 0.25
     this.x += this.velX
     this.y += this.velY
+
+    // Collide with border
+    const dist = Math.sqrt(this.x * this.x + this.y * this.y)
+    if (dist > BORDER_RADIUS - this.getRadius()) {
+      const angle = Math.atan2(this.y, this.x)
+      this.x = Math.cos(angle) * (BORDER_RADIUS - this.getRadius())
+      this.y = Math.sin(angle) * (BORDER_RADIUS - this.getRadius())
+    }
 
     // Draw a circle
     const radius = this.getRadius()
@@ -172,10 +183,23 @@ class GameManager {
         const player = this.players.find((p) => p.id === data.pid)
         const food = this.food.find((f) => f.id === data.fid)
         player.mass += 1
+        player.score += 1
         food.x = data.fNewX
         food.y = data.fNewY
         break
     }
+  }
+  updateScoreAndLeaderboard() {
+    const leaderboard = document.getElementById('leaderboard-contents')
+    leaderboard.innerHTML = ''
+    this.players.sort((a, b) => b.mass - a.mass)
+    for (const p of this.players) {
+      const li = document.createElement('li')
+      li.innerText = `${p.name} - ${p.mass}`
+      leaderboard.appendChild(li)
+    }
+    const score = document.getElementById('score')
+    score.innerText = this.you.score
   }
 
   X(pos) {
@@ -234,7 +258,7 @@ class GameManager {
     this.cam.x = this.you.x
     this.cam.y = this.you.y
 
-    // Update logic -> collision
+    // Update logic -> collision with food
     for (const f of this.food) {
       const chX = this.you.x - f.x
       const chY = this.you.y - f.y
@@ -242,6 +266,9 @@ class GameManager {
         socket.send(JSON.stringify({ type: 'eat', pid: this.you.id, fid: f.id }))
       }
     }
+
+    // Update and draw score and leaderboard HTML
+    this.updateScoreAndLeaderboard()
 
     // Socket logic
     if (this.tick % 10 === 0) {
@@ -264,6 +291,13 @@ class GameManager {
     this.ctx.clearRect(0, 0, innerWidth, innerHeight)
     this.ctx.fillStyle = '#111'
     this.ctx.fillRect(0, 0, innerWidth, innerHeight)
+
+    // Draw surrounding circular border
+    this.ctx.beginPath()
+    this.ctx.arc(this.X(0), this.Y(0), this.S(BORDER_RADIUS + BORDER_THICKNESS / 2), 0, 2 * Math.PI)
+    this.ctx.strokeStyle = '#fff'
+    this.ctx.lineWidth = this.S(BORDER_THICKNESS)
+    this.ctx.stroke()
 
     // Draw elements
     for (const f of this.food) {
