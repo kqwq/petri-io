@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      containers:
+        - name: nodejs-app
+          image: your-docker-repo/nodejs-app:latest # Replace with your Docker image
+          ports:
+            - containerPort: 3000
+            - containerPort: 3001
+          env:
+            # Define any environment variables if needed
+      # Optional: resource requests/limits
+      resources:
+        requests:
+          memory: '256Mi'
+          cpu: '500m'
+        limits:
+          memory: '512Mi'
+          cpu: '1'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-app-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4000 # New port for HTTP traffic
+      targetPort: 3000
+    - port: 4001 # New port for WebSocket traffic
+      targetPort: 3001
+  selector:
+    app: nodejs-app

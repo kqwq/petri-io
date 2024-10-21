@@ -97,6 +97,11 @@ async function startWsServer(ip, port) {
             state.players.push(data.joiner)
             ws.send(JSON.stringify({ type: 'init-food', state }))
             app.publish('test1channel', JSON.stringify({ type: 'update-players', players: state.players }))
+          } else if (data.type === 'rejoin') {
+            const player = state.players.find((p) => p.id === data.joiner.id)
+            if (!player) return
+            player.active = true
+            app.publish('test1channel', JSON.stringify({ type: 'update-players', players: state.players }))
           } else if (data.type === 'move') {
             const player = state.players.find((p) => p.id === data.id)
             if (!player) return

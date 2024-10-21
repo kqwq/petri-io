@@ -117,9 +117,13 @@ class GameManager {
 
   join() {
     this.you.name = document.getElementById('name').value
-    this.players.push(this.you)
     this.you.active = true
-    this.socket.send(JSON.stringify({ type: 'join', joiner: this.you.repr() }))
+    if (this.players.find((p) => p.id === this.you.id)) {
+      this.socket.send(JSON.stringify({ type: 'rejoin', joiner: this.you.repr() }))
+    } else {
+      this.players.push(this.you)
+      this.socket.send(JSON.stringify({ type: 'join', joiner: this.you.repr() }))
+    }
   }
   handleKeyDown(e) {
     this.keys[e.key] = true
@@ -188,7 +192,7 @@ class GameManager {
         // If a player is not in the incoming list, remove it
         this.players = this.players.filter((p) => incomingPlayerIds.includes(p.id))
         // Finally, sort the players by mass
-        this.players.sort((a, b) => a.mass - b.mass)
+        this.players.sort((a, b) => b.mass - a.mass)
         break
 
       case 'update-eat':
@@ -199,7 +203,7 @@ class GameManager {
         food.x = data.fNewX
         food.y = data.fNewY
         // Sort the players by mass
-        this.players.sort((a, b) => a.mass - b.mass)
+        this.players.sort((a, b) => b.mass - a.mass)
         break
     }
   }

@@ -54,6 +54,7 @@ function main() {
   const canvas = document.getElementsByTagName('canvas')[0]
   const ctx = canvas.getContext('2d')
   const gm = new GameManager(ctx, socket)
+  window.gm = gm // Expose for debugging
   const gameLoop = () => {
     gm.draw()
     requestAnimationFrame(gameLoop)
