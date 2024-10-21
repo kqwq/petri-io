@@ -24,3 +24,5 @@ This project consists of 3 parts.
 - Create chrome extension with deployments list and options to
   1. Create and deploy new server (input ports)
   2. Delete deployment
+
+For Dockerfile with client, might want to look into: https://stackoverflow.com/a/74185824
