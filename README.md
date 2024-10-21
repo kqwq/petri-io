@@ -20,7 +20,6 @@ This project consists of 3 parts.
 
 ## TODO
 
-- All the collisions need to be based on the server. Client sends the desired pull direction, server sends the output movement.
 - Create chrome extension with deployments list and options to
   1. Create and deploy new server (input ports)
   2. Delete deployment

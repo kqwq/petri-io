@@ -1,0 +1,13 @@
+version: '3.8'
+name: petri_io_server
+services:
+  server:
+    image: kqwq/petri-io-server
+    ports:
+      - '3000:3000'
+      - '3001:3001'
+    # volumes:
+    #   - ./app:/app
+    environment:
+      NODE_ENV: development
+    command: ['node', 'server.mjs']

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: petri-io-server-service
+spec:
+  selector:
+    app: petri-io-server
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: LoadBalancer # You can change this to ClusterIP or NodePort based on your needs
