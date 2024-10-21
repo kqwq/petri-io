@@ -122,6 +122,7 @@ class GameManager {
       this.socket.send(JSON.stringify({ type: 'rejoin', joiner: this.you.repr() }))
     } else {
       this.players.push(this.you)
+      this.players.sort((a, b) => a.mass - b.mass)
       this.socket.send(JSON.stringify({ type: 'join', joiner: this.you.repr() }))
     }
   }
@@ -192,7 +193,7 @@ class GameManager {
         // If a player is not in the incoming list, remove it
         this.players = this.players.filter((p) => incomingPlayerIds.includes(p.id))
         // Finally, sort the players by mass
-        this.players.sort((a, b) => b.mass - a.mass)
+        this.players.sort((a, b) => a.mass - b.mass)
         break
 
       case 'update-eat':
@@ -203,14 +204,14 @@ class GameManager {
         food.x = data.fNewX
         food.y = data.fNewY
         // Sort the players by mass
-        this.players.sort((a, b) => b.mass - a.mass)
+        this.players.sort((a, b) => a.mass - b.mass)
         break
     }
   }
   updateScoreAndLeaderboard() {
     const leaderboard = document.getElementById('leaderboard-contents')
     leaderboard.innerHTML = ''
-    this.players.sort((a, b) => b.mass - a.mass)
+    this.players.sort((a, b) => a.mass - b.mass)
     for (const p of this.players) {
       const li = document.createElement('li')
       li.innerText = `${p.name} - ${p.mass}`
