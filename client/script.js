@@ -7,7 +7,7 @@ function addEventListeners(gm, canvas) {
   })
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
-  const sgbOverlay = document.getElementById('overlay')
+  const overlayDiv = document.getElementById('overlay')
   const startButton = document.getElementById('start-game-button')
   const nameInput = document.getElementById('name')
   nameInput.addEventListener('keydown', (e) => {
@@ -21,7 +21,7 @@ function addEventListeners(gm, canvas) {
       return
     }
     gm.join()
-    sgbOverlay.style.display = 'none'
+    overlayDiv.style.display = 'none'
   })
   document.addEventListener('keydown', (e) => {
     gm.handleKeyDown(e)
@@ -71,7 +71,9 @@ function main() {
   })
   socket.addEventListener('message', gm.onSocketMessage.bind(gm))
   socket.addEventListener('close', () => {
-    alert('Disconnected from server')
+    gm.you.active = false
+    const overlayDiv = document.getElementById('overlay')
+    overlayDiv.style.display = 'flex'
     ct.textContent = 'Disconnected from server'
   })
 }

@@ -28,7 +28,7 @@ function getSpawnXY() {
 }
 
 function initState() {
-  state.players = [] // { name, id, x, y, mass, color }
+  state.players = [] // { name, id, x, y, mass, color, active }
   state.food = [] // { x, y }
   for (let i = 0; i < NUM_FOOD_PARTICLES; i++) {
     const { x, y } = getSpawnXY()
@@ -102,16 +102,7 @@ async function startWsServer(ip, port) {
             if (!player) return
             player.x = data.x
             player.y = data.y
-            ws.publish('test1channel', JSON.stringify({ type: 'update-movement', id: player.id, x: player.x, y: player.y, s: data.s, d: data.d }))
-          } else if (data.type === 'eat') {
-            const player = state.players.find((p) => p.id === data.pid)
-            const food = state.food.find((f) => f.id === data.fid)
-            if (!player || !food) return
-            player.mass += 1
-            const { x, y } = getSpawnXY()
-            food.x = x
-            food.y = y
-            app.publish('test1channel', JSON.stringify({ type: 'update-eat', pid: player.id, fid: food.id, fNewX: food.x, fNewY: food.y }))
+            app.publish('test1channel', JSON.stringify({ type: 'update-movement', id: player.id, x: player.x, y: player.y, s: data.s, d: data.d }))
           } else if (data.type === 'leave') {
             state.players = state.players.filter((p) => p.id !== data.id)
           }
@@ -131,13 +122,63 @@ async function startWsServer(ip, port) {
         console.error(`Failed to listen to websocket server on port ${port}`)
       }
     })
+
+  return app
+}
+
+function getPlayerRadius(mass) {
+  return Math.sqrt(mass)
+}
+function getFoodRadius() {
+  return 1
+}
+
+function serverGameLoop(app) {
+  // Collision with players and food
+  for (const player of state.players) {
+    if (!player.active) continue
+    for (const food of state.food) {
+      const dx = player.x - food.x
+      const dy = player.y - food.y
+      const distanceSq = dx * dx + dy * dy
+      if (distanceSq <= getPlayerRadius(player.mass) ** 2 - getFoodRadius() ** 2) {
+        player.mass += 1
+        const { x, y } = getSpawnXY()
+        food.x = x
+        food.y = y
+        app.publish('test1channel', JSON.stringify({ type: 'update-eat', pid: player.id, fid: food.id, fNewX: food.x, fNewY: food.y }))
+      }
+    }
+  }
+
+  // Collision with other players
+  for (const player of state.players) {
+    if (!player.active) continue
+    for (const other of state.players) {
+      if (!other.active) continue
+      if (player.id === other.id) continue
+      // If player eats other player
+      if (player.mass <= other.mass) continue
+      const dx = player.x - other.x
+      const dy = player.y - other.y
+      const distanceSq = dx * dx + dy * dy
+      if (distanceSq <= getPlayerRadius(player.mass) ** 2 - getPlayerRadius(other.mass) ** 2) {
+        player.mass += other.mass
+        other.active = false
+        app.publish('test1channel', JSON.stringify({ type: 'update-players', players: state.players }))
+      }
+    }
+  }
 }
 
 async function main() {
   try {
     const ip = await startHttpServer(HTTP_PORT)
     await generateQRCode(ip, HTTP_PORT)
-    await startWsServer(ip, WS_PORT)
+    const app = await startWsServer(ip, WS_PORT)
+    const interval = setInterval(() => {
+      serverGameLoop(app)
+    }, 1000 / 60)
   } catch (error) {
     console.error('Error starting servers:', error)
   }

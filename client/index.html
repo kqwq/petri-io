@@ -82,6 +82,26 @@
 
 
       }
+      #leaderboard-div {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 0.5em;
+        border-radius: 0.2em;
+        width: 200px;
+        font-size: smaller;
+      }
+      #leaderboard-contents ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      #leaderboard-contents li {
+        display: flex;
+        justify-content: space-between;
+      }
+      #death-info {
+        display: none;
+        margin-top: 1em;
+      }
       #hud {
         width: 100%;
         display: flex;
@@ -100,7 +120,7 @@
     <div id="hud" class="roboto-regular">
       <div id="score-div">Score: <span id="score">0</span></div>
       <div id="leaderboard-div">
-        <h3>Leaderboard</h3>
+        <b>Leaderboard</b>
         <div id="leaderboard-contents"></div>
       </div>
 
@@ -111,6 +131,10 @@
         <div id="connection-info">
           <p id="connection-text">Loading JavaScript...</p>
           <div id="connection-loading"></div>
+        </div>
+        <div id="death-info">
+          <p id="death-text">You died!</p>
+          <button id="respawn-button">Respawn</button>
         </div>
         <p for="name" id="label-name">Enter your name:</p>
         <input type="text" id="name" placeholder="Name" required minlength="1" maxlength="256" />

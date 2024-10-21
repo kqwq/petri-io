@@ -48,6 +48,7 @@ class Player {
   }
   repr() {
     return {
+      active: this.active,
       name: this.name,
       id: this.id,
       x: this.x,
@@ -58,11 +59,14 @@ class Player {
   }
 
   draw(ctx, X, Y, S) {
+    if (!this.active) return
     // Movement
+    // console.log(this.x, this.y, this.direction, this.speed)
     const gotoVelX = Math.cos(this.direction) * this.speed
     const gotoVelY = Math.sin(this.direction) * this.speed
     this.velX += (gotoVelX - this.velX) * 0.25
     this.velY += (gotoVelY - this.velY) * 0.25
+    // console.log(this.x)
     this.x += this.velX
     this.y += this.velY
 
@@ -135,6 +139,14 @@ class GameManager {
   }
   onSocketOpen() {}
 
+  youDied() {
+    console.log('You died')
+    const overlayDiv = document.getElementById('overlay')
+    const deathInfoDiv = document.getElementById('death-info')
+    overlayDiv.style.display = 'flex'
+    deathInfoDiv.style.display = 'block'
+  }
+
   onSocketMessage(e) {
     const data = JSON.parse(e.data)
     // console.log(data)
@@ -146,34 +158,37 @@ class GameManager {
         }
         break
       case 'update-movement':
-        const player2 = this.players.find((p) => p.id === data.id)
-        if (!player2) return
-        player2.x = data.x
-        player2.y = data.y
-        player2.speed = data.s
-        player2.direction = data.d
+        const p = this.players.find((p) => p.id === data.id)
+        if (!p) return
+        p.x = data.x
+        p.y = data.y
+        p.speed = data.s
+        p.direction = data.d
         break
       case 'update-players':
-        // console.log('update-players', data.players, gm.players, gm.you)
+        console.log('update-players', this.players)
         const incomingPlayerIds = data.players.map((p) => p.id)
-        for (const { name, id, x, y, mass, color } of data.players) {
+        for (const { active, name, id, x, y, mass, color } of data.players) {
           const p = this.players.find((p) => p.id === id)
-
+          if (id === this.you.id && this.you.active && !active) {
+            this.youDied()
+          }
           if (p) {
+            p.active = active
             p.x = x
             p.y = y
             p.mass = mass
             p.color = color
-            console.log('original')
           } else {
             const newP = new Player(name, id, x, y, mass, color)
             newP.active = true
             this.players.push(newP)
-            console.log('new')
           }
         }
         // If a player is not in the incoming list, remove it
         this.players = this.players.filter((p) => incomingPlayerIds.includes(p.id))
+        // Finally, sort the players by mass
+        this.players.sort((a, b) => a.mass - b.mass)
         break
 
       case 'update-eat':
@@ -183,6 +198,8 @@ class GameManager {
         player.score += 1
         food.x = data.fNewX
         food.y = data.fNewY
+        // Sort the players by mass
+        this.players.sort((a, b) => a.mass - b.mass)
         break
     }
   }
@@ -225,52 +242,38 @@ class GameManager {
   }
 
   draw() {
-    if (this.mouse.out || !this.you.active) {
-      this.you.speed *= 0.9
-    } else {
-      let cx = 0,
-        cy = 0
-      if (this.keys['w'] || this.keys['ArrowUp']) cy = -1
-      if (this.keys['s'] || this.keys['ArrowDown']) cy = 1
-      if (this.keys['a'] || this.keys['ArrowLeft']) cx = -1
-      if (this.keys['d'] || this.keys['ArrowRight']) cx = 1
-      if (cx || cy) {
-        this.you.direction = Math.atan2(cy, cx)
-        this.you.speed = this.you.getMaxSpeed()
+    this.tick++
+    if (this.you.active) {
+      let sendDirection = 0
+      let sendSpeed = 0
+      if (this.mouse.out) {
+        this.you.speed *= 0.9
+        sendSpeed = this.you.speed
+        sendDirection = this.you.direction
       } else {
-        // Mouse controls
-        const dx = this.mouse.x - this.X(this.you.x)
-        const dy = this.mouse.y - this.Y(this.you.y)
-        const mouseDistanceRatio = (Math.sqrt(dx * dx + dy * dy) / Math.min(innerWidth, innerHeight)) * 4 // Reach from half the screen
-        this.you.direction = Math.atan2(dy, dx)
-        if (mouseDistanceRatio < 0.1) {
-          this.you.speed = 0
+        let cx = 0,
+          cy = 0
+        if (this.keys['w'] || this.keys['ArrowUp']) cy = -1
+        if (this.keys['s'] || this.keys['ArrowDown']) cy = 1
+        if (this.keys['a'] || this.keys['ArrowLeft']) cx = -1
+        if (this.keys['d'] || this.keys['ArrowRight']) cx = 1
+        if (cx || cy) {
+          sendDirection = Math.atan2(cy, cx)
+          sendSpeed = this.you.getMaxSpeed()
         } else {
-          this.you.speed = this.you.getMaxSpeed() * Math.min(1, mouseDistanceRatio)
+          // Mouse controls
+          const dx = this.mouse.x - this.X(this.you.x)
+          const dy = this.mouse.y - this.Y(this.you.y)
+          const mouseDistanceRatio = (Math.sqrt(dx * dx + dy * dy) / Math.min(innerWidth, innerHeight)) * 4 // Reach from half the screen
+          sendDirection = Math.atan2(dy, dx)
+          if (mouseDistanceRatio < 0.1) {
+            sendSpeed = 0
+          } else {
+            sendSpeed = this.you.getMaxSpeed() * Math.min(1, mouseDistanceRatio)
+          }
         }
       }
-    }
-
-    // Update logic -> camera
-    this.cam.x = this.you.x
-    this.cam.y = this.you.y
-
-    // Update logic -> collision with food
-    if (this.you.active) {
-      for (const f of this.food) {
-        const chX = this.you.x - f.x
-        const chY = this.you.y - f.y
-        if (chX * chX + chY * chY < this.you.getRadius() * this.you.getRadius() + f.getRadius() * f.getRadius()) {
-          this.socket.send(JSON.stringify({ type: 'eat', pid: this.you.id, fid: f.id }))
-        }
-      }
-    }
-
-    // Update and draw score and leaderboard HTML
-    this.updateScoreAndLeaderboard()
-
-    // Socket logic
-    if (this.you.active) {
+      // Send your player movement to socket
       if (this.tick % 10 === 0) {
         this.socket.send(
           JSON.stringify({
@@ -278,13 +281,60 @@ class GameManager {
             id: this.you.id,
             x: this.you.x,
             y: this.you.y,
-            s: this.you.speed,
-            d: this.you.direction,
+            s: sendSpeed,
+            d: sendDirection,
           })
         )
       }
-      this.tick++
     }
+
+    // Update logic -> camera
+    this.cam.x = this.you.x
+    this.cam.y = this.you.y
+
+    // // Update logic -> collision with food
+    // if (this.you.active) {
+    //   for (const f of this.food) {
+    //     const chX = this.you.x - f.x
+    //     const chY = this.you.y - f.y
+    //     if (chX * chX + chY * chY < this.you.getRadius() * this.you.getRadius() + f.getRadius() * f.getRadius()) {
+    //       this.socket.send(JSON.stringify({ type: 'eat', pid: this.you.id, fid: f.id }))
+    //     }
+    //   }
+    // }
+
+    // // Update logic -> collision with other players
+    // if (this.you.active) {
+    //   for (const p of this.players) {
+    //     if (p.id === this.you.id) continue
+    //     const chX = this.you.x - p.x
+    //     const chY = this.you.y - p.y
+    //     if (chX * chX + chY * chY < this.you.getRadius() * this.you.getRadius() + p.getRadius() * p.getRadius()) {
+    //       if (this.you.mass > p.mass) {
+    //         this.socket.send(JSON.stringify({ type: 'leave', id: p.id }))
+    //         this.you.mass += p.mass
+    //         this.you.score += p.score
+    //       }
+    //     }
+    //   }
+    // }
+
+    // // Socket logic
+    // if (this.you.active) {
+    //   if (this.tick % 10 === 0) {
+    //     this.socket.send(
+    //       JSON.stringify({
+    //         type: 'move',
+    //         id: this.you.id,
+    //         x: this.you.x,
+    //         y: this.you.y,
+    //         s: this.you.speed,
+    //         d: this.you.direction,
+    //       })
+    //     )
+    //   }
+    //   this.tick++
+    // }
 
     // Draw logic
 
@@ -319,8 +369,14 @@ class GameManager {
     for (const f of this.food) {
       f.draw(this.ctx, this.X.bind(this), this.Y.bind(this), this.S.bind(this))
     }
-    for (const p of this.players) {
+    for (let i = 0; i < this.players.length; i++) {
+      const p = this.players[i]
       p.draw(this.ctx, this.X.bind(this), this.Y.bind(this), this.S.bind(this))
+    }
+
+    // Every 1 second, update score and leaderboard
+    if (this.tick % 60 === 0) {
+      this.updateScoreAndLeaderboard()
     }
   }
 }
