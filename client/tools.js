@@ -60,6 +60,9 @@ const tools = {
   rantInt: (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min
   },
+  randId: () => {
+    return Math.random().toString(36).slice(2)
+  },
 
   /**
    * Get font color based on background color

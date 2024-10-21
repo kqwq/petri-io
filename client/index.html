@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Agar.io</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <style>
       canvas {
         /* Set the canvas to the full width and height of the window */
@@ -20,20 +23,29 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         z-index: 1;
+        background-color: rgba(0, 0, 0, 0.5);
+        
+      }
+      #overlay-item {
+        background-color: white;
+        padding: 2em;
+        border-radius: 1em;
+        text-align: center;
+        width: 400px;
       }
       #overlay h1 {
-        color: white;
         font-size: 3em;
-        margin-bottom: 1em;
+        margin-bottom: 0em;
       }
-      #overlay p {
-        color: white;
+      #overlay sub {
+        font-size: 1em;
+      } 
+      #overlay #label-name {
         font-size: 1.5em;
         margin-bottom: 0.5em;
       }
@@ -45,16 +57,39 @@
       #overlay button {
         padding: 0.5em 1em;
         font-size: 1em;
-        background-color: white;
-        color: black;
+        background-color: rgb(255, 123, 40);
+        color: white;
         border: none;
         cursor: pointer;
+      }
+      #overlay button:hover {
+        background-color: rgb(255, 123, 40, 0.8);
+      }
+      #connection-info {
+        border: 1px dashed black;
+        padding: 1em;
+        margin-top: 1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+      }
+      #connection-loading {
+        background-image: url("loading.gif");
+        width: 1em;
+        height: 1em;
+        background-size: contain;
+
+
       }
       #hud {
         width: 100%;
         display: flex;
         justify-content: space-between;
-        color: white;
+ 
+      }
+      body {
+        font-family: "Roboto", sans-serif;
       }
     </style>
     <script src="script.js" type="module"></script>
@@ -62,7 +97,7 @@
 
   <body>
     <canvas></canvas>
-    <div id="hud">
+    <div id="hud" class="roboto-regular">
       <div id="score-div">Score: <span id="score">0</span></div>
       <div id="leaderboard-div">
         <h3>Leaderboard</h3>
@@ -70,10 +105,17 @@
       </div>
 
     <div id="overlay">
-      <h1>Budget Agar.io</h1>
-      <p>Enter your name:</p>
-      <input type="text" id="name" placeholder="Name" required minlength="1" maxlength="256" />
-      <button id="start-game-button">Start Game</button>
+      <div id="overlay-item">
+        <h1>Petri.io</h1>
+        <sub>A multiplayer game by <a href="https://github.com/kqwq">Kyle W</a></sub>
+        <div id="connection-info">
+          <p id="connection-text">Loading JavaScript...</p>
+          <div id="connection-loading"></div>
+        </div>
+        <p for="name" id="label-name">Enter your name:</p>
+        <input type="text" id="name" placeholder="Name" required minlength="1" maxlength="256" />
+        <button id="start-game-button">Join</button>
+      </div>
     </div>
   </body>
 </html>

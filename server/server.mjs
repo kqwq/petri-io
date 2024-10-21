@@ -61,7 +61,7 @@ async function startHttpServer(port) {
             if (e) {
               reject(`An error occurred on ${net.address}: ${e}`)
             } else {
-              console.log(`Listening on ${net.address}:${port}`)
+              console.log(`Listening to http://${net.address}:${port}`)
               resolve(net.address)
             }
           })
@@ -72,14 +72,14 @@ async function startHttpServer(port) {
 }
 
 async function generateQRCode(ip, port) {
-  qrcode.generate(`http://${ip}:${port}`, { small: true })
+  qrcode.generate(`${ip}:${port}`, { small: true })
 }
 
 async function startWsServer(ip, port) {
   const app = new App()
 
   app
-    .ws('/budget-agario', {
+    .ws('/petri-io', {
       compression: 0,
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 10,
@@ -126,9 +126,9 @@ async function startWsServer(ip, port) {
     })
     .listen(port, (listenSocket) => {
       if (listenSocket) {
-        console.log(`Listening to ws://${ip}:${port}`)
+        console.log(`Started websocket server on port ${port}`)
       } else {
-        console.error(`Failed to listen to ws://${ip}:${port}`)
+        console.error(`Failed to listen to websocket server on port ${port}`)
       }
     })
 }
