@@ -1,7 +1,7 @@
 {
-  "name": "Petri.io Server Manager",
+  "name": "Petri.io Deployment Manager",
   "version": "1.0.1",
-  "description": "Petri.io Server Manager",
+  "description": "Petri.io Deployment Manager",
   "manifest_version": 3,
   "author": "Kyle W",
   "action": {

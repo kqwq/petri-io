@@ -1,16 +1,43 @@
 <head>
     <title>Petri.io Deployment Manager</title>
     <meta charset="utf-8">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        width: 400px;
+      }
+      #header {
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.5em;
+      }
+      sub {
+        font-size: 1em;
+      }
+
+    </style>
 </head>
 <body>
-  <h1>Petri.io Deployment Manager</h1>
-  <sub>My Kubernetes Cluster</sub>
+  <div id="header">
+    <h1>Petri.io Deployment Manager</h1>
+    <sub>My Kubernetes Cluster</sub>
+  </div>
   <!-- Nodes list -->
   <div id="nodes"></div>
   
   <div id="options">
     <button id="refresh">Refresh</button>
-    <button id="add-node">Add Node</button>
+    <button id="add-node" onclick="btnAddNode">Add Node</button>
   </div>
   
 </body>
