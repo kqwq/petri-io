@@ -9,6 +9,9 @@ dev:
 	echo "Starting development server"
 	cd server && node server.mjs
 
+operator-start:
+	node operator-server/operator.mjs
+
 docker-build:
 	echo "Building docker image"
 	docker build -f containerization/Dockerfile.server -t kqwq/petri-io-server .

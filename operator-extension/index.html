@@ -31,13 +31,24 @@
       header {
         padding: 10px;
       }
-      button {
+      #options button {
         padding: 5px;
-        margin: 5px;
         border: none;
+        border-radius: 5px;
         cursor: pointer;
-        background-color: #333;
+        background-color: rgb(116, 116, 116);
         color: white;
+        font-size: 0.7em;
+        display: flex;
+        align-items: center;
+      }
+      #options {
+        display: flex;
+        justify-content: start;
+        margin: 2px;
+      }
+      #options i {
+        font-size: 1.5em;
       }
     </style>
     <style>
@@ -118,9 +129,11 @@
   <div id="nodes"></div>
   
   <div id="options">
-    <button id="refresh">Refresh</button>
-    <button id="add-node" onclick="btnAddNode()">Add Node</button>
+    <!-- <button id="refresh">Refresh</button> -->
+    <!-- <button id="add-node" onclick="btnAddNode()">Add Node</button> -->
+    <button id="add-node" onclick="btnAddNode()"><i class="material-icons">add</i>Add Node</button>
   </div>
+
   
 </body>
 </html>
