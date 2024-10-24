@@ -7,9 +7,11 @@ spec:
     app: petri-io-server
   ports:
     - protocol: TCP
+      name: web-http
       port: 3000
       targetPort: 3000
     - protocol: TCP
+      name: web-socket
       port: 3001
       targetPort: 3001
-  type: LoadBalancer # You can change this to ClusterIP or NodePort based on your needs
+  type: NodePort

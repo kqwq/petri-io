@@ -167,7 +167,7 @@ function renderHtml() {
               <input type="text" placeholder="Name" class="new-pod-name" />
               <input type="text" placeholder="IP" class="new-pod-ip" />
               <input type="number" placeholder="Port" class="new-pod-port" />
-              <a onclick="btnAddPod('${node.id}')" href="#" class="new-pod-add">Add Pod</a>
+              <a onclick="btnAddPod('${node.id}')" href="#" class="new-pod-add">Add Server</a>
             </div>
         </div>`
     })

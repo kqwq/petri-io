@@ -14,7 +14,11 @@ op:
 
 docker-build:
 	echo "Building docker image"
-	docker build -f containerization/Dockerfile.server -t kqwq/petri-io-server .
+	docker build -f containerization/Dockerfile.server -t kqwq/petri-io-server:latest .
+
+docker-push:
+	echo "Pushing docker image"
+	docker push kqwq/petri-io-server:latest
 
 docker-compose:
 	echo "Starting docker-compose"
@@ -25,5 +29,6 @@ k8s-deploy-minikube:
 	minikube start
 	minikube kubectl -- apply -f containerization/k8s-deployment.yaml
 	minikube kubectl -- apply -f containerization/k8s-service.yaml
+	minikube service 
 	minikube kubectl -- get pods
 	minikube kubectl -- get services

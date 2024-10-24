@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: kqwq/petri-io-server
+          image: kqwq/petri-io-server:latest
           ports:
             - containerPort: 3000
             - containerPort: 3001
