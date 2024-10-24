@@ -75,8 +75,19 @@ class Pod {
 }
 const nodes = []
 
+function sendToOperatorServer(route, params) {
+  console.log(`Sending to operator server: ${route}`, params)
+  return fetch(`http://localhost:5555${route}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  })
+}
+
 function btnAddNode(optionalName) {
-  const nodeName = optionalName ?? prompt('Enter node name')
+  const nodeName = optionalName ?? $(`#new-node-name`).value
   const node = new Node(nodeName)
   nodes.push(node)
   renderHtml()
@@ -95,6 +106,9 @@ function btnAddPod(id, optionalName, optionalIp, optionalPort) {
   } else {
     throw new Error(`No node found with id ${id}`)
   }
+}
+function btnStartCluster() {
+  sendToOperatorServer('/create-cluster')
 }
 
 function debugOnly() {

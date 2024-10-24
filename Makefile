@@ -9,8 +9,8 @@ dev:
 	echo "Starting development server"
 	cd server && node server.mjs
 
-operator-start:
-	node operator-server/operator.mjs
+op:
+	cd operator-server && node main.mjs
 
 docker-build:
 	echo "Building docker image"
@@ -18,7 +18,7 @@ docker-build:
 
 docker-compose:
 	echo "Starting docker-compose"
-	docker compose -f containerization/docker-compose.yaml 
+	docker compose -f containerization/docker-compose.yaml up
 	
 k8s-deploy-minikube:
 	echo "Deploying to k8s"
