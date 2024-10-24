@@ -2,6 +2,9 @@
     <title>Petri.io Deployment Manager</title>
     <meta charset="utf-8">
     <style>
+      * {
+        /* border: dotted 1px red; */
+      }
       body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -21,11 +24,90 @@
         margin: 0;
         font-size: 1.5em;
       }
+
       sub {
         font-size: 1em;
       }
-
+      header {
+        padding: 10px;
+      }
+      button {
+        padding: 5px;
+        margin: 5px;
+        border: none;
+        cursor: pointer;
+        background-color: #333;
+        color: white;
+      }
     </style>
+    <style>
+      /* Styles for #nodes */
+      #nodes .node {
+        border: solid 1px #ccc;
+        padding: 10px;
+      }
+      #nodes h2 {
+        margin: 0;
+        font-size: 1.2em;
+        margin-bottom: 4px;
+      }
+      #nodes .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #nodes .pod {
+        border: solid 1px #ccc;
+        background-color: rgba(255, 255, 255, 0.3);
+        padding: 5px;
+      }
+      #nodes a {
+        color: black;
+        text-decoration: none;
+      }
+      #nodes a:hover {
+        text-decoration: underline;
+      }
+      #nodes .pod:hover {
+        background-color: rgba(255, 255, 255, 0.6);
+      }
+      #nodes .pod-view {
+        font-size: smaller;
+        color: gray;
+      }
+      #nodes .pod-title {
+        font-size: 0.9em;
+      }
+      #nodes button {
+        border: none;
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0);
+        padding: 0;
+      }
+      #nodes i.material-icons {
+        font-size: 1.5em;
+      }
+      #nodes .new-pod {
+        display: flex;
+        gap: 5px;
+        margin-top: 5px;
+      }
+      #nodes input {
+        font-size: 0.8em;
+        height: 20px;
+        width: 100px;
+      }
+      #nodes .new-pod-add {
+        font-size: small;
+      }
+      
+    </style>
+  <script src="script.js"></script>
+  <script>
+
+
+  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
   <div id="header">
@@ -37,7 +119,7 @@
   
   <div id="options">
     <button id="refresh">Refresh</button>
-    <button id="add-node" onclick="btnAddNode">Add Node</button>
+    <button id="add-node" onclick="btnAddNode()">Add Node</button>
   </div>
   
 </body>
